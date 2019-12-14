@@ -2,6 +2,7 @@ import React from 'react';
 import {Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core';
 
 function roundToTwo(num) {
+  return parseInt(num)
     return +(Math.round(num + "e+2")  + "e-2");
 }
 
@@ -28,8 +29,8 @@ export default ({spent, debt, currUser, users}) => {
             <TableCell component="th" scope="row">
               {name}
             </TableCell>
-            <TableCell align="right">{roundToTwo(totalSpent)} $</TableCell>
-            <TableCell align="right">{roundToTwo(totalDebt)} $</TableCell>
+            <TableCell align="right">{roundToTwo(totalSpent)}$</TableCell>
+            <TableCell align="right">{roundToTwo(totalDebt)}$</TableCell>
           </TableRow>
         ))}
       </TableBody>

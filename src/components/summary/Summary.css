@@ -1,19 +1,21 @@
 .summary-paper {
   margin-right: 10px;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   padding: 10px 15px;
-  min-height: 300px;
+  height: 100%;
   width: 100%;
 }
 .graph-paper {
-  padding: 5px 20px;
-  margin: 10px 10px;
-  height: 90%;
+  padding: 5px 10px;
+  margin: 10px 0px;
+  margin-right: 5px;
+  margin-bottom: 20px;
+  max-height: 95%;
 }
 .table-paper {
-  padding: 5px 20px;
-  margin: 10px 10px;
-  height: 75%;
+  padding: 5px 10px;
+  margin: 10px 0px;
+  height: 70%;
   display: grid;
 }
 .paper-table-container {
@@ -30,5 +32,8 @@
 .settle-up-button {
   float: right;
   padding-right: 10px !important;
-  margin-right: 10px !important;
+  margin-right: 2px !important;
+}
+.MuiTableCell-sizeSmall {
+  padding: 6px 5px 6px 4px !important;
 }

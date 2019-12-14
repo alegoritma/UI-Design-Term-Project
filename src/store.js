@@ -106,6 +106,7 @@ export const houseData = {
   bills: [
     {
       cost: 80,
+      addedBy: "Jason",
       to: 'Internet',
       date: '2019.11.30',
       weights: [
@@ -117,6 +118,7 @@ export const houseData = {
   ],
   fixedExpenses: [
     {
+      addedBy: "Trevor",
       to: 'Rent',
       date: '2019.05.10',
       cost: 1200,

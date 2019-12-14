@@ -1,0 +1,28 @@
+.flow-paper {
+  /* margin-left: 10px !important; */
+  /* margin-bottom: 20px; */
+  padding: 10px 15px;
+  height: 100%;
+  width: 100%;
+  display: inline-grid;
+}
+
+.activity-flow-container {
+  margin-top: 0;
+  padding: 10px 3px;
+  overflow-y: scroll;
+  height: 100%;
+  /* max-height: calc(40vh - 30px); */
+  /* max-height: 40vh; */
+}
+.activity-flow-container div {
+  /* border: solid black 1px; */
+  border-radius: 18px;
+  padding: 4px 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.activity-flow-container div+div {
+  margin-top: 5px;
+}

@@ -1,10 +1,6 @@
 import React from 'react';
 import {VictoryChart, VictoryGroup, VictoryBar, VictoryLegend} from 'victory';
 
-
-
-
-
 function constructData({spent, debt, currUser}){
   let totalDebt = []
   let totalSpent = []
@@ -23,7 +19,8 @@ export default (props) => {
     <VictoryChart
       domainPadding={{x: [40, 40], y:[0,40]}}
       padding={{left: 50, right: 30, top: 10, bottom: 40}}
-      style={{labels: {fontSize: 24}}}
+
+      style={{labels: {fontSize: 24}, maxHeight: '30px', width:'auto'}}
       //theme={VictoryTheme.material}
     >
       <VictoryLegend x={100} y={0}

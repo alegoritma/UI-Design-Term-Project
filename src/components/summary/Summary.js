@@ -42,9 +42,9 @@ class Summary extends Component {
     const {spent, debt} = calcEach(houseData);
     return <Paper className="summary-paper">
       <Typography variant="h6">Summary</Typography>
-      <Grid container>
+      <Grid container style={{height: '95%'}}>
 
-        <Grid item md={6} sm={12}>
+        <Grid item md={7} sm={12}>
           <Paper className="graph-paper">
             <Typography variant="subtitle1">Graph</Typography>
             <Graph
@@ -55,7 +55,7 @@ class Summary extends Component {
             />
           </Paper>
         </Grid>
-        <Grid item md={6} sm={12}>
+        <Grid item md={5} sm={12}>
           <Paper className="table-paper">
             <Typography variant="subtitle1">Table</Typography>
             <div className="paper-table-container">
