@@ -3,11 +3,20 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { Provider } from 'react-redux';
+import initialState from './features/initialState';
+import configureStore from './store/configureStore';
+
 // import {MuiThemeProvider} from 'material-ui/core';
+
+const store = configureStore(initialState);
+
 
 ReactDOM.render(
   // <MuiThemeProvider>
-    <App />,
+  <Provider store={store}>
+    <App />
+    </Provider>,
   /* </MuiThemeProvider>, */
   document.getElementById('root'));
 

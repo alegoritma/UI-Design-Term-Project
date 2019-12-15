@@ -15,24 +15,28 @@
 .table-paper {
   padding: 5px 10px;
   margin: 10px 0px;
-  height: 70%;
-  display: grid;
+  height: fit-content;
+  display: flow-root;
 }
 .paper-table-container {
-  max-height: 100%;
   margin-top: 10px;
+  width: 100%;
   padding-bottom: 10px;
   overflow-y: auto;
+  display: inline-block;
 }
 .settle-up-button-container {
-  height: 30%;
+  height: 100%;
   width: 100%;
-  padding-top: 5px;
+  display: flex;
+  /* background-color: red; */
 }
 .settle-up-button {
-  float: right;
+  margin-top: auto !important;
+  margin-left: auto !important;
   padding-right: 10px !important;
   margin-right: 2px !important;
+  margin-bottom: 5px !important;
 }
 .MuiTableCell-sizeSmall {
   padding: 6px 5px 6px 4px !important;

@@ -6,6 +6,7 @@ import Summary from './summary/Summary';
 import Flow from './flow/Flow';
 import { green } from '@material-ui/core/colors';
 import withWidth from '@material-ui/core/withWidth';
+import NewActivity from './newActivity/NewActivity';
 
 function Dashboard({width}) {
     const isSmall = (width=='xs' || width=='sm')
@@ -13,6 +14,7 @@ function Dashboard({width}) {
       <CssBaseline />
       <Header />
       <Container style={{ paddingBottom: 50 }} fixed>
+        <NewActivity />
         <Grid container direction={isSmall?'column-reverse':'row'}
           style={{zIndex:'1', position: "relative", maxWidth: 1200, margin: 'auto', paddingTop: 20, marginBottom: '20px'}} >
           <Grid item md={7} sm={12}>

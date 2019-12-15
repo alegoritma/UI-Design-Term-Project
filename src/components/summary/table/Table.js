@@ -15,7 +15,7 @@ export default ({spent, debt, currUser, users}) => {
     }
   })
   return (
-    <Table size="small" aria-label="Period" style={{overflowY: 'auto'}}>
+    <Table size="small" aria-label="Period" className="summary-table" style={{overflowY: 'auto'}}>
       <TableHead>
         <TableRow>
           <TableCell>Mate</TableCell>
