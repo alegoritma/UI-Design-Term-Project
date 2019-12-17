@@ -13,7 +13,7 @@ function Dashboard({width}) {
     return <Fragment>
       <CssBaseline />
       <Header />
-      <Container style={{ paddingBottom: 50 }} fixed>
+      <Container style={{ paddingBottom: 50}} fixed>
         <NewActivity />
         <Grid container direction={isSmall?'column-reverse':'row'}
           style={{zIndex:'1', position: "relative", maxWidth: 1200, margin: 'auto', paddingTop: 20, marginBottom: '20px'}} >

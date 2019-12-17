@@ -1,4 +1,4 @@
-import {CHANGE_ACTIVE, UPDATE_FIELDS, RESET} from './constants';
+import {CHANGE_ACTIVE, UPDATE_FIELDS, UPDATE_ACT_TYPE, RESET} from './constants';
 
 export function updateActive(bool){
   return {
@@ -16,5 +16,11 @@ export function updateFields(fields){
 export function reset(){
   return {
     type: RESET
+  }
+}
+export function updateActivityType(actType){
+  return {
+    type: UPDATE_ACT_TYPE,
+    payload: actType
   }
 }

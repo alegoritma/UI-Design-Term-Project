@@ -1,4 +1,4 @@
-import {CHANGE_ACTIVE, UPDATE_FIELDS, RESET} from './constants';
+import {CHANGE_ACTIVE, UPDATE_FIELDS, UPDATE_ACT_TYPE, RESET} from './constants';
 
 // First I thought activities may have different data fields,
 // later I realized that they can have same field names.
@@ -7,7 +7,7 @@ import {CHANGE_ACTIVE, UPDATE_FIELDS, RESET} from './constants';
 
 export const newActivity = {
   active: true,//false,
-  activityType: null, // oneof: payments, bills, fixedExpenses
+  activityType: "payments", // oneof: payments, bills, fixedExpenses
   fields: {
     paidBy: '',
     date: '', //2019.11.15
@@ -29,6 +29,8 @@ function newActivityReducer(state = newActivity, {type, payload}) {
   switch (type) {
     case CHANGE_ACTIVE:
       return {...state, active: payload} // To show modal
+    case UPDATE_ACT_TYPE:
+      return {...state, activityType: payload}
     case UPDATE_FIELDS:
       return {...state, fields: {...state.fields, ...payload}}
     case RESET:

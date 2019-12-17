@@ -52,7 +52,7 @@ class Flow extends React.Component {
     // console.log(e.target.scrollTop, e.target);
   }
   render() {
-    const {width, activities} = this.props;
+    const {width, activities, currentUser} = this.props;
     const {nOfShownActs} = this.state;
     return <Grid container style={{height: '100%'}}>
       <Grid item sm={10} md={10} style={{height: '100%'}}>
@@ -65,7 +65,7 @@ class Flow extends React.Component {
 
           <Paper className="activity-flow-container" id="activity-flow-container">
             {activities.slice(0, nOfShownActs).map((activity, i) => {
-              return <Activity activity={activity} key={`activity-${i}`}/>
+              return <Activity activity={activity} currentUser={currentUser} key={`activity-${i}`}/>
             })}
           </Paper>
         </Paper>
@@ -94,6 +94,7 @@ const mapDispatchToProps = dispatch => {
 }
 const mapStateToProps = state => {
   return {
+    currentUser: state.house.currentUser,
     activities: mergeAndSortActivities(state.activities)
   }
 }

@@ -1,22 +1,33 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import {submitActivity} from '../../features/activities/actions';
-import {updateActive, updateFields, reset} from '../../features/newActivity/actions';
+import {updateActive, updateFields, updateActivityType, reset} from '../../features/newActivity/actions';
 import { withStyles } from '@material-ui/core/styles';
-import {Modal, Backdrop, Fade, Paper, FormControl, FormHelperText, Typography,
-Select, MenuItem, InputLabel, TextField, Input, InputAdornment, Chip, Grid,
-ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Slider } from '@material-ui/core/';
+import {Modal, Backdrop, Fade, Paper, FormControl, FormHelperText, Typography, List, ListItem, ListItemText, Collapse, ListItemSecondaryAction ,
+Select, MenuItem, InputLabel, TextField, Input, InputAdornment, Chip, Grid, Button, IconButton, Grow,
+ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Slider, Dialog, DialogTitle } from '@material-ui/core/';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker} from '@material-ui/pickers';
-import { indigo, grey } from '@material-ui/core/colors';
-import {Done, AddCircle, ExpandMore } from '@material-ui/icons/';
+import { indigo, grey, green, red, yellow } from '@material-ui/core/colors';
+import {Done, AddCircle, ExpandMore, Equalizer, ViewWeek, Remove, Add } from '@material-ui/icons/';
 
-console.log(Chip);
+
+function roundToTwo(num) {
+  return +(Math.round(num + "e+2")  + "e-2");
+}
+
 const styles = (theme) => ({
   modal: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    // display: 'flex',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // overflowY: 'auto'
+  },
+  dialogHeader: {
+    padding: '10px 0px',
+    marginBottom: '1rem',
+    color: 'white',
+    backgroundColor: indigo[500]
   },
   // paper: {
   //   backgroundColor: theme.palette.background.paper,
@@ -25,7 +36,7 @@ const styles = (theme) => ({
   //   padding: theme.spacing(2, 4, 3),
   // },
   container: {
-    backgroundColor: indigo[500],
+
     display: 'grid',
   },
   formContainer: {
@@ -54,6 +65,7 @@ const styles = (theme) => ({
     padding: 2
   },
   engagedPeopleSubText: {
+    marginTop: '1.1rem',
     marginBottom: '2px',
     textAlign: 'center',
   },
@@ -63,20 +75,15 @@ const styles = (theme) => ({
     marginRight: 'auto !important',
     backgroundColor: grey[300],
     marginTop: '-3px !important',
-    '&$expanded': {
-      marginTop: '-3px !important',
-      marginRight: 'auto !important',
-      marginLeft: 'auto !important',
-    }
+    paddingTop: '3px'
+    // '&$expanded': {
+    //   marginTop: '-3px !important',
+    //   marginRight: 'auto !important',
+    //   marginLeft: 'auto !important',
+    // }
   },
-  expansionSummary: {
-      margin: 'auto !important',
-  },
-  heading: {
-    // fontSize: theme.typography.pxToRem(15),
-    // fontWeight: theme.typography.fontWeightRegular,
-    flexShrink: 0,
-
+  collapseHeader: {
+    display: 'flex'
   },
   expansionDetail: {
     width: '20rem',
@@ -87,6 +94,35 @@ const styles = (theme) => ({
   weightPercent: {
     ...theme.typography.button,
     margin: 'auto 2rem'
+  },
+  toggleButton: {
+    margin: 'auto',
+    marginTop: '.5rem',
+    marginRight: '8px'
+  },
+  collapseListItemText: {
+    marginLeft: '1rem'
+  },
+  collapseHeaderText: {
+    // display: 'flex'
+  },
+  collapseHeaderSubtext: {
+    marginLeft: '.5rem !important'
+  },
+  adjustList: {
+    marginLeft: '1rem',
+    marginRight: '1rem'
+  },
+  adjustListItem: {
+    display: 'block',
+    padding: '2px'
+  },
+  listItemHeading: {
+    marginLeft: '.3rem'
+  },
+  adjustListItemText: {
+    marginTop: '0px',
+    marginBottom: '0px'
   }
 });
 
@@ -101,225 +137,293 @@ class NewActivity extends Component {
     this.state = {
       weightsMap,
       selecteds: [],
-      total: 1
+      total: 0,
+      toggle: false,
+      noPeopleSelected: false,
     }
     this.handleChange = this.handleChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleChipSelect = this.handleChipSelect.bind(this);
-    this.handleExpansionChange = this.handleExpansionChange.bind(this);
-    this.splitEqually = this.splitEqually.bind(this);
     this.handleWeightChange = this.handleWeightChange.bind(this);
     this.setTotal = this.setTotal.bind(this);
+    this.toggleCollapse = this.toggleCollapse.bind(this);
+    this.submit = this.submit.bind(this);
+    this.handleDateChange(new Date());
   }
-
   handleChange(e){
-    console.log(e.target.name, e.target.value)
+    this.props.updateFields({[e.target.name]: e.target.value})
   }
   handleDateChange(d){
-    console.log(d)
+    this.props.updateFields({
+      date: (
+            `${String(d.getFullYear())}.`+
+            `${String(d.getMonth() + 1).padStart(2, '0')}.`+
+            `${String(d.getDate()).padStart(2, '0')}`
+          )
+        })
   }
   handleChipSelect(name, e){
     console.log(e, name);
-    const {weightsMap} = this.state;
+    const {weightsMap, toggle} = this.state;
     if (weightsMap[name] !== false){ // deselecting
       let selecteds = [];
       Object.keys(weightsMap).forEach((_name) => {
-        if (weightsMap[_name] !== false && _name !== name ){selecteds.push(_name);}})
+        if (weightsMap[_name] !== false && _name !== name ){selecteds.push(_name);}
+      })
       this.setState({
-        weightsMap: {...weightsMap, [name]: false}, selecteds
+        weightsMap: {...weightsMap, [name]: false}, selecteds, toggle: (toggle&&selecteds.length!==0)
       })
       console.log(selecteds);
     } else {  // selecting
       let selecteds = [];
       Object.keys(weightsMap).forEach((_name) => {
-        if (weightsMap[_name] !== false || _name === name){selecteds.push(_name);}})
+        if (weightsMap[_name] !== false || _name === name){selecteds.push(_name);}
+      })
       this.setState({
-        weightsMap: {...weightsMap, [name]: 100}, selecteds
+        weightsMap: {...weightsMap, [name]: 0}, selecteds
       })
       console.log(selecteds);
     }
   }
-  handleExpansionChange(e, opened){
-    this.splitEqually()
-  }
-  splitEqually(){
+  setTotal(name, val){
     const {weightsMap, selecteds} = this.state;
-    let _weightsMap = {}
-    Object.keys(weightsMap).forEach((name) => {
-      if (weightsMap[name] !== false){
-        _weightsMap[name] = 100
-      }
-    })
-    this.setState({weightsMap: {...weightsMap,..._weightsMap}, weightsEqual: true})
-  }
-  setTotal(){
-    const {weightsMap} = this.state;
     let total = 0;
-    Object.values(weightsMap).forEach(val => total+=(val===false)?0:val)
-    this.setState({total: total/100})
+    selecteds.forEach(_name => total += (_name===name)?val:weightsMap[_name])
+    this.setState({total: total})
   }
   handleWeightChange(name, val){
-    const {weightsMap} = this.state;
-    this.setState({weightsMap: {...weightsMap, [name]: val }}, this.setTotal)
+    this.setState(prevState => ({weightsMap: {...prevState.weightsMap, [name]: val }}))
+  }
+  toggleCollapse(){
+    this.setState(prevState=>({toggle: !prevState.toggle}))
   }
   submit(e){
+    console.log(e);
     e.preventDefault();
-    console.log(e)
+    if (this.state.selecteds.length === 0){
+      console.log("selecteds 0", this.state.selecteds.length);
+      this.setState({noPeopleSelected: true},
+        ()=>{setTimeout(() => { this.setState({noPeopleSelected: false}) }, 2000);})
+    } else {
+      console.log("selecteds not 0", this.state.selecteds.length);
+      const {toggle, total, weightsMap, selecteds} = this.state;
+      let weights;
+      if (toggle){
+        console.log("Collapse is open");
+        if (total === 100){
+          console.log("total is 100");
+          weights = selecteds.map((name) => ({name, weight: weightsMap[name]}))
+        } else {console.log("total is not 100 ->", total); return} // Maybe should raise warning? ******************************************
+      } else {
+        console.log("Collapse is open");
+
+        weights = selecteds.map((name) => ({name, weight: 1/selecteds.length}))
+      }
+      const {activityType, fields, house} = this.props;
+
+      this.props.submitActivity(activityType, {...fields, paidBy: house.currentUser, weights})
+      // this.props.updateActive(false)
+      this.props.reset()
+    }
   }
   render(){
     const {active, activityType, fields, classes, house} = this.props;
-    const {weightsMap, selecteds, total} = this.state;
+    const {weightsMap, selecteds, total, toggle} = this.state;
+
     return (
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
+        <Dialog
+          scroll='body'
           className={classes.modal}
           open={active}
           onClose={this.props.reset}
-          onEscapeKeyDown={this.props.reset}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
         >
-          <Fade in={active}>
-            <Paper className={classes.container}>
-              <h2 id="transition-modal-title" style={{margin: 'auto', color: 'white', marginTop: '.5rem', marginBottom: '.4rem'}}>
-                Add New Activity
-              </h2>
-              <Paper className={classes.formContainer}>
-                <form onSubmit={this.submit} style={{display: 'grid', height: 'fit-content'}}>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel id="activityType-label">Activity Type</InputLabel>
-                    <Select required
-                      labelId="activityType-label"
-                      id="activityType"
-                      name='activityType'
-                      // defaultValue={activityType}
-                      onChange={this.handleChange}
-                    >
-                      <MenuItem value={'payments'}>Payment</MenuItem>
-                      <MenuItem value={'bills'}>Bill</MenuItem>
-                      <MenuItem value={'fixedExpenses'}>Fixed Expense</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl className={classes.formControl}>
-                    <TextField required
-                      id="name"
-                      name="name"
-                      label="Activity Name"
-                      onChange={this.handleChange}
-                    />
-                  </FormControl>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel id="cost-labelid">Cost *</InputLabel>
-                    <Input required
-                      // labelId="cost-labelid"
-                      id="cost"
-                      name="cost"
-                      type="number"
-                      min="1"
-                      step="1"
-                      startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                      onChange={this.handleChange}
-                    />
-                  </FormControl>
-                  <FormControl className={classes.formControl}>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                      <KeyboardDatePicker required
-                        disableToolbar
-                        variant="inline"
-                        format="MM/dd/yyyy"
-                        margin="normal"
-                        id="date"
-                        label="Date"
-                        // Set initial date also in store ***************************
-                        onChange={this.handleDateChange}
-                        KeyboardButtonProps={{
+
+          <DialogTitle id="simple-dialog-title"
+            disableTypography
+            className={classes.dialogHeader}>
+            <Typography variant='h5' style={{margin: 'auto', textAlign: 'center'}}>
+              New Activity
+            </Typography>
+          </DialogTitle>
+          <Paper className={classes.container}>
+            <Paper className={classes.formContainer}>
+              <form onSubmit={this.submit} style={{display: 'grid', height: 'fit-content'}}>
+                <FormControl className={classes.formControl}>
+                  <InputLabel id="activityType-label">Activity Type</InputLabel>
+                  <Select required
+
+                    labelId="activityType-label"
+                    id="activityType"
+                    name='activityType'
+                    defaultValue={activityType}
+                    onChange={this.props.updateActivityType}
+                  >
+                    <MenuItem value={'payments'}>Payment</MenuItem>
+                    <MenuItem value={'bills'}>Bill</MenuItem>
+                    <MenuItem value={'fixedExpenses'}>Fixed Expense</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                  <TextField required
+                    id="name"
+                    name="name"
+                    label="Activity Name"
+                    onChange={this.handleChange}
+                  />
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                  <InputLabel id="cost-labelid">Cost *</InputLabel>
+                  <Input required
+                    // labelId="cost-labelid"
+                    id="cost"
+                    name="cost"
+                    type="number"
+                    inputProps={{ min: "0", step: "1" }}
+                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                    onChange={this.handleChange}
+                  />
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <KeyboardDatePicker required
+                      disableToolbar
+                      variant="inline"
+                      format="MM/dd/yyyy"
+                      margin="normal"
+                      id="date"
+                      label="Date"
+                      // Set initial date also in store ***************************
+                      onChange={this.handleDateChange}
+                      KeyboardButtonProps={{
                           'aria-label': 'change date',
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
-                  </FormControl>
-                  <FormControl className={classes.formControl}>
-                    <FormHelperText className={classes.engagedPeopleSubText}>
-                      Select people who will pay. Deselect yourself if this is a debt.
-                    </FormHelperText>
-                    <Paper className={classes.chips} id="chips-container">
-                      {Object.keys(weightsMap).map((name,i) => {
-                        if (weightsMap[name] === false){
-                          return <Chip
-                            key={`chip-select-${i}`}
-                            clickable
-                            onClick={(e)=>this.handleChipSelect(name, e)}
-                            variant="outlined"
-                            size="small"
-                            label={name==house.currentUser?'You':name}
-                            icon={<AddCircle />} />
-                        } else {
-                          return <Chip
-                            key={`chip-select-${i}`}
-                            clickable
-                            onClick={(e)=>this.handleChipSelect(name, e)}
-                            color="primary"
-                            size="small"
-                            label={name==house.currentUser?'You':name}
-                            icon={<Done />} />
+                      }}
+                    />
+                  </MuiPickersUtilsProvider>
+                </FormControl>
+                <FormControl className={classes.formControl}>
+                  <InputLabel required shrink htmlFor="chips-container">Engaged People</InputLabel>
+                  <FormHelperText className={classes.engagedPeopleSubText}>
+                    Select people who will pay. Deselect yourself if this is a debt.
+                  </FormHelperText>
+                  <Paper className={classes.chips} id="chips-container">
+                    {Object.keys(weightsMap).map((name,i) => {
+                      if (weightsMap[name] === false){
+                        return <Chip
+                          key={`chip-select-${i}`}
+                          clickable
+                          onClick={(e)=>this.handleChipSelect(name, e)}
+                          variant="outlined"
+                          size="small"
+                          label={name==house.currentUser?'You':name}
+                          icon={<AddCircle />} />
+                      } else {
+                        return <Chip
+                          key={`chip-select-${i}`}
+                          clickable
+                          onClick={(e)=>this.handleChipSelect(name, e)}
+                          color="primary"
+                          size="small"
+                          label={name==house.currentUser?'You':name}
+                          icon={<Done />} />
+                      }
+                    })}
+                  </Paper>
+                  <Grow
+                    style={{position: 'absolute', border: 'solid 1px '+yellow[1000], marginLeft:'.5rem', marginTop:'2.39rem', zIndex:'2', borderRadius: '1rem', paddingLeft: '1rem', paddingRight: '1rem'}}
+                    timeout={{exit: 1000}}
+                    in={this.state.noPeopleSelected}
+                  >
+                    <Typography variant="subtitle1" style={{ backgroundColor: yellow[800], color: red[50]}}>
+                      Please select at least one Engaged Person
+                    </Typography>
+                  </Grow>
+                  <Paper className={classes.expansionPanel}>
+                    <div className={classes.collapseHeader}>
+                      <ListItemText
+                        disableTypography
+                        className={classes.collapseListItemText}
+                        primary={
+                          <Typography variant="subtitle2" className={classes.collapseHeaderText}>
+                            {toggle
+                              ?<strong style={{color: indigo[500]}}>{`${total}% Distributed`}</strong>
+                              :(selecteds.length===0?'Please select Engaged People':'Splitting Equally')
+                            }
+                          </Typography>
                         }
-                      })}
-
-                    </Paper>
-                    <ExpansionPanel className={classes.expansionPanel}
-                      disabled={selecteds.length ===0}
-                      onChange={this.handleExpansionChange}
-                      TransitionProps={{ unmountOnExit: true }} >
-                      <ExpansionPanelSummary
-                        className={classes.expansionSummary}
-                        expandIcon={<ExpandMore size='small'/>}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography variant="subtitle2" className={classes.heading}>{selecteds.length===0?'Please select engaged people.':'Splitting equally.'}</Typography>
-                      </ExpansionPanelSummary>
-
-                      <ExpansionPanelDetails className={classes.expansionDetail}>
-                        <div style={{display: 'grid', }}>
-                          {selecteds.map((name, i) => {
-                            return <Grid container style={{width: '17rem', paddingLeft: '3px', paddingRight: '3px', marginRight: '.4rem'}}>
-                              <Grid item xs={9}>
-                                <Typography id={`input-slider-${name}`} gutterBottom>
-                                  {name}
-                                </Typography>
+                        secondary={selecteds.length===0?false:
+                        <Typography variant="caption" style={{color: toggle?(total==100)?green[800]:red[800]:grey[700]}} className={classes.collapseHeaderSubtext}>
+                          {toggle
+                            ?(total==100
+                              ?"Distribution is valid!"
+                              :`Distribution is not valid! ${total<100?(100-total)+"% more needed!":(total-100)+"% need to be excluded!"}`)
+                            :(`Each selected people pays ${roundToTwo(fields.cost/selecteds.length)}$`)}
+                        </Typography>
+                        }
+                      />
+                      {selecteds.length!==0&&
+                        <IconButton
+                          size="small"
+                          variant="contained"
+                          onClick={this.toggleCollapse} className={classes.toggleButton}>
+                          {toggle?<Equalizer />:<ViewWeek />}
+                        </IconButton>
+                      }
+                    </div>
+                    <Collapse className={classes.expansionDetail} in={toggle}>
+                      <List className={classes.adjustList}>
+                        {selecteds.map((name, i) => {
+                          return <ListItem className={classes.adjustListItem} key={`input-slider-listitem-${name}`}>
+                            <Typography
+                              id={`input-slider-${name}`}
+                              variant='subtitle2'
+                              className={classes.listItemHeading} >
+                              {`${name} (${weightsMap[name]}%)`}
+                            </Typography>
+                            <Grid container>
+                              <Grid item xs={1}>
+                                <IconButton size='small' onClick={
+                                  (e) => {this.handleWeightChange(name,
+                                    (weightsMap[name]>=1?weightsMap[name]-1:weightsMap[name]))
+                                    this.setTotal()
+                                  }}>
+                                  <Remove fontSize="inherit" />
+                                </IconButton>
+                              </Grid>
+                              <Grid item xs={10} style={{paddingLeft: '.5rem', paddingRight: '.5rem'}}>
                                 <Slider
+                                  style={{margin: 'auto'}}
+                                  step={1}
                                   key={`weights-slider-${i}`}
                                   value={weightsMap[name]}
-                                  onChangeCommitted={(e,val) => this.handleWeightChange(name, val)}
+                                  onChange={(e,val) => this.handleWeightChange(name, val)}
+                                  onChangeCommitted={(e,val)=>this.setTotal(name, val)}
                                   aria-labelledby={`input-slider-${name}`}
                                 />
                               </Grid>
-                              <Grid item xs={3} style={{display: 'flex'}}>
-                                <Typography className={classes.weightPercent} >
-                                  {parseInt(weightsMap[name]/(total))}%
-                                </Typography>
+                              <Grid item xs={1}>
+                                <IconButton size='small' onClick={
+                                  (e) => {this.handleWeightChange(name,
+                                    (weightsMap[name]<=99?weightsMap[name]+1:weightsMap[name]))
+                                    this.setTotal()
+                                  }
+                                }>
+                                  <Add fontSize="inherit" />
+                                </IconButton>
                               </Grid>
                             </Grid>
-                          })}
-                        </div>
-                      </ExpansionPanelDetails>
-                    </ExpansionPanel>
-                  </FormControl>
-
-                  <FormControl className={classes.formControl}>
-
-                  </FormControl>
-
-                </form>
-
-              </Paper>
+                          </ListItem>
+                        })}
+                      </List>
+                    </Collapse>
+                  </Paper>
+                </FormControl>
+                <Button type="submit">
+                  Add
+                </Button>
+              </form>
             </Paper>
-          </Fade>
-        </Modal>
+          </Paper>
+        </Dialog>
         );
   }
 }
@@ -334,6 +438,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => {
   return {
     updateActive: (bool) => dispatch(updateActive(bool)),
+    updateActivityType: ({target}) => dispatch(updateActivityType(target.value)),
     updateFields: (fields) => dispatch(updateFields(fields)),
     reset: () => dispatch(reset()),
     submitActivity: (activityType, fields) => dispatch(submitActivity(activityType, fields))
