@@ -6,7 +6,7 @@ import {CHANGE_ACTIVE, UPDATE_FIELDS, UPDATE_ACT_TYPE, RESET} from './constants'
 // I will follow the firmer, rather than revising it.
 
 export const newActivity = {
-  active: true,//false,
+  active: false,
   activityType: "payments", // oneof: payments, bills, fixedExpenses
   fields: {
     paidBy: '',

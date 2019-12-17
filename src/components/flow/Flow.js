@@ -17,7 +17,7 @@ const AddButton = withStyles(theme => ({
       backgroundColor: green[500],
     },
     position: 'absolute',
-    top: 'calc(6rem - 24px)',
+    top: 'calc(6rem - 28px)',
     marginLeft: '15px',
     zIndex: '2'
   },
@@ -71,8 +71,8 @@ class Flow extends React.Component {
         </Paper>
       </Grid>
       <Grid item sm={2} md={2}>
-        <AddButton size="medium" onClick={this.props.openModal} aria-label="add" >
-          <AddIcon />
+        <AddButton size="large" onClick={this.props.openModal} aria-label="add" >
+          <AddIcon fontSize="large" />
         </AddButton>
       </Grid>
     </Grid>

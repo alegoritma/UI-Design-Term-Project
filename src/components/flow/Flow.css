@@ -9,9 +9,12 @@
 
 .activity-flow-container {
   margin-top: 0;
-  padding: 10px 3px;
+  padding: 7px 1px 10px 1px;
+  margin-left: 2px ;
   overflow-y: scroll;
   height: 100%;
+  background-color: #f0f0f0 !important;
+  border-radius: .5rem !important;
   /* max-height: calc(40vh - 30px); */
   /* max-height: 40vh; */
 }

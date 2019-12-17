@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux';
 import './Summary.css';
 import {Paper, Typography, Grid, Fab} from '@material-ui/core';
-import {houseData} from '../../store';
 import Graph from './graph/Graph';
 import Table from './table/Table';
 import MoneyOffIcon from '@material-ui/icons/MoneyOff';
 import withWidth from '@material-ui/core/withWidth';
 
-function calcEach({users, payments, bills, fixedExpenses}){
+function calcEach(users, {payments, bills, fixedExpenses}){
   let spent = {}
   let debt = {}
   users.forEach(user => {
@@ -43,12 +43,11 @@ const heightByWidth = {
   "lg": "11rem",
   "xl": "11rem"
 }
-calcEach(houseData)
 class Summary extends Component {
-
   render() {
-    const {width} = this.props;
-    const {spent, debt} = calcEach(houseData);
+    const {width, activities, house: {users, currentUser}} = this.props;
+
+    const {spent, debt} = calcEach(users, activities);
     return <Paper className="summary-paper">
       <Typography variant="h6">Summary</Typography>
       <Grid container style={{height: '95%'}}>
@@ -59,8 +58,8 @@ class Summary extends Component {
             <Graph
               spent={spent}
               debt={debt}
-              users={houseData.users}
-              currUser={"Jack"}
+              users={users}
+              currUser={currentUser}
             />
           </Paper>
         </Grid>
@@ -71,8 +70,8 @@ class Summary extends Component {
               <Table
                 spent={spent}
                 debt={debt}
-                users={houseData.users}
-                currUser={"Jack"}
+                users={users}
+                currUser={currentUser}
               />
             </div>
           </Paper>
@@ -87,4 +86,8 @@ class Summary extends Component {
     </Paper>;
   }
 }
-export default withWidth()(Summary);
+const mapStateToProps = state => ({
+  house: state.house,
+  activities: state.activities
+})
+export default connect(mapStateToProps)(withWidth()(Summary));

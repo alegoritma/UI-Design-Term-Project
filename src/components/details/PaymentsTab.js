@@ -16,12 +16,13 @@ class PaymentsTab extends Component {
     }
   }
   render() {
-    const {users, payments} = this.props;
+    const {users, currentUser, payments} = this.props;
     const {selectedUser} = this.state;
     return <Fragment>
       <LeftTab
         style={{overflowY: 'auto', maxHeight: 500}}
         selectedUser={selectedUser}
+        currentUser={currentUser}
         users={users}
         selectUser={this.handleSelectUser}
       />

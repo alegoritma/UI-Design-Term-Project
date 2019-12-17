@@ -7,17 +7,22 @@ import { Provider } from 'react-redux';
 import initialState from './features/initialState';
 import configureStore from './store/configureStore';
 
-// import {MuiThemeProvider} from 'material-ui/core';
+// import {MuiThemeProvider, getMuiTheme} from '@material-ui/styles';
 
+// const muiTheme = getMuiTheme({
+//   appBar: {
+//     height: 56, // Instead of 64
+//   },
+// });
 const store = configureStore(initialState);
 
 
 ReactDOM.render(
-  // <MuiThemeProvider>
   <Provider store={store}>
+    {/* <MuiThemeProvider muiTheme={muiTheme}> */}
     <App />
-    </Provider>,
-  /* </MuiThemeProvider>, */
+    {/* </MuiThemeProvider> */}
+</Provider>,
   document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
